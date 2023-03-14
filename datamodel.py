@@ -1,10 +1,49 @@
-# TradingState class
+import json
+from typing import Dict, List
+from json import JSONEncoder
 
 Time = int
 Symbol = str
 Product = str
 Position = int
+UserId = str
 Observation = int
+
+
+class Listing:
+    def __init__(self, symbol: Symbol, product: Product, denomination: Product):
+        self.symbol = symbol
+        self.product = product
+        self.denomination = denomination
+
+
+class Order:
+    def __init__(self, symbol: Symbol, price: int, quantity: int) -> None:
+        self.symbol = symbol
+        self.price = price
+        self.quantity = quantity
+
+    def __str__(self) -> str:
+        return "(" + self.symbol + ", " + str(self.price) + ", " + str(self.quantity) + ")"
+
+    def __repr__(self) -> str:
+        return "(" + self.symbol + ", " + str(self.price) + ", " + str(self.quantity) + ")"
+    
+
+class OrderDepth:
+    def __init__(self):
+        self.buy_orders: Dict[int, int] = {}
+        self.sell_orders: Dict[int, int] = {}
+
+
+class Trade:
+    def __init__(self, symbol: Symbol, price: int, quantity: int, buyer: UserId = None, seller: UserId = None, timestamp: int = 0) -> None:
+        self.symbol = symbol
+        self.price: int = price
+        self.quantity: int = quantity
+        self.buyer = buyer
+        self.seller = seller
+        self.timestamp = timestamp
 
 class TradingState(object):
     def __init__(self,
@@ -25,60 +64,7 @@ class TradingState(object):
         
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True)
-
-# TradingState class
-
-
-# Trade class
-
-Symbol = str
-UserId = str
-
-class Trade:
-    def __init__(self, symbol: Symbol, price: int, quantity: int, buyer: UserId = None, seller: UserId = None, timestamp: int = 0) -> None:
-        self.symbol = symbol
-        self.price: int = price
-        self.quantity: int = quantity
-        self.buyer = buyer
-        self.seller = seller
-        self.timestamp = timestamp
-
-    def __str__(self) -> str:
-        return "(" + self.symbol + ", " + self.buyer + " << " + self.seller + ", " + str(self.price) + ", " + str(self.quantity) + ", " + str(self.timestamp) + ")"
-
-    def __repr__(self) -> str:
-        return "(" + self.symbol + ", " + self.buyer + " << " + self.seller + ", " + str(self.price) + ", " + str(self.quantity) + ", " + str(self.timestamp) + ")" + self.symbol + ", " + self.buyer + " << " + self.seller + ", " + str(self.price) + ", " + str(self.quantity) + ")"
-
-# Trade class
-
-
-# OrderDepth class
-
-class OrderDepth:
-    def __init__(self):
-        self.buy_orders: Dict[int, int] = {}
-        self.sell_orders: Dict[int, int] = {}
-
-# OrderDepth class
-
-
-# Order class
-
-Symbol = str
-
-class Order:
-    def __init__(self, symbol: Symbol, price: int, quantity: int) -> None:
-        self.symbol = symbol
-        self.price = price
-        self.quantity = quantity
-
-    def __str__(self) -> str:
-        return "(" + self.symbol + ", " + str(self.price) + ", " + str(self.quantity) + ")"
-
-    def __repr__(self) -> str:
-        return "(" + self.symbol + ", " + str(self.price) + ", " + str(self.quantity) + ")"
-
-# Order class
-
-
-
+    
+class ProsperityEncoder(JSONEncoder):
+        def default(self, o):
+            return o.__dict__
