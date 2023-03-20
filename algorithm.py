@@ -50,10 +50,11 @@ class Trader:
 
                 result[symbol] = orders
 
-        print("---", state.position[product_name])
+        print(" ----- Position:", state.position[product_name])
         for symbol, trade in state.own_trades.items():
             print(trade);
-        print("---")
+        print()
+        print()
         print()
 
         return result
