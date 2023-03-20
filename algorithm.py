@@ -21,6 +21,11 @@ class Trader:
                 acceptable_buy_price = 9999
                 acceptable_sell_price = 10001
 
+                print(" --- Position:", state.position.setdefault(product_name, 0))
+                for symbol, trade in state.own_trades.items():
+                    print(trade);
+
+                print("\nACTIONS:");
 
 
                 if state.position.setdefault(product_name, 0) < 0:
@@ -50,11 +55,6 @@ class Trader:
 
                 result[symbol] = orders
 
-        print(" ----- Position:", state.position[product_name])
-        for symbol, trade in state.own_trades.items():
-            print(trade);
-        print()
-        print()
-        print()
 
+        print("\n---\n\n");
         return result
