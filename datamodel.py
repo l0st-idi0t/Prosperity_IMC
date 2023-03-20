@@ -45,6 +45,12 @@ class Trade:
         self.seller = seller
         self.timestamp = timestamp
 
+    def __str__(self) -> str:
+        return "(" + self.symbol + ", " + str(self.price) + ", " + str(self.quantity) + ")"
+
+    def __repr__(self) -> str:
+        return "(" + self.symbol + ", " + str(self.price) + ", " + str(self.quantity) + ")"
+
 class TradingState(object):
     def __init__(self,
                  timestamp: Time,

@@ -1,5 +1,6 @@
 from datamodel import *
 import pandas as pd
+import time as chronos
 
 
 def simulate(round: int, day: int, trader):
@@ -68,6 +69,8 @@ def simulate(round: int, day: int, trader):
             state.listings[product] = listing[product]
             state.order_depths[product] = depth[product]
         prev_time = time
+
+        chronos.sleep(0.5)
 
 
 from algorithm import Trader
