@@ -11,11 +11,10 @@ class Trader:
         and outputs a list of orders to be sent
         """
         result = {}
-        print(state)
 
         for symbol, listing in state.listings.items():
             if symbol == "PEARLS":
-                product_name = listing.product;
+                product_name = listing['product']
                 order_depth: OrderDepth = state.order_depths[symbol]
                 orders: list[Order] = []
 
@@ -23,7 +22,7 @@ class Trader:
                 acceptable_sell_price = 10001
 
 
-                if state.position.get(product_name, 0) >= 0:
+                if state.position.setdefault(product_name, 0) >= 0:
                     # We buy here
                     # We look at SELL orders (Negative volume)
                     if len(order_depth.sell_orders) > 0:
@@ -36,6 +35,7 @@ class Trader:
                             print("BUY", str(-best_ask_volume) + "x", best_ask)
                             orders.append(Order(symbol, best_ask, -best_ask_volume))
 
+                        state.position[product_name] += -best_ask_volume;
                 else:
                     # We sell here
                     # We look at BUY orders (Positive volume)
@@ -47,7 +47,9 @@ class Trader:
                         # Also makes sure that our position is within range
                         if best_bid >= acceptable_sell_price:
                             print("SELL", str(best_bid_volume) + "x", best_bid)
-                            orders.append(Order(symbol, best_bid, -best_bid_volume))
+                            orders.append(Order(symbol, best_bid, best_bid_volume))
+
+                        state.position[product_name] += best_bid_volume;
 
                 result[symbol] = orders
 
