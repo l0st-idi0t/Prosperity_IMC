@@ -15,23 +15,14 @@ class Trader:
         """
         result = {}
 
-        for symbol, listing in state.listings.items():
-            if symbol == "PEARLS":
-                product_name = listing['product']
-                order_depth: OrderDepth = state.order_depths[symbol]
+        for product, order_depth in state.order_depths.items():
+            if product == "PEARLS":
                 orders: list[Order] = []
 
-                acceptable_buy_price = 9999
-                acceptable_sell_price = 10001
+                acceptable_buy_price = 9998
+                acceptable_sell_price = 10002
 
-                print(" --- Position:", state.position.setdefault(product_name, 0))
-                for symbol, trade in state.own_trades.items():
-                    print(trade);
-
-                print("\nACTIONS:");
-
-
-                if state.position.setdefault(product_name, 0) < 0:
+                if state.position.get(product, 0) <= 0:
                     # Position is negative, We buy here
                     # We look at SELL orders (Negative volume)
                     if len(order_depth.sell_orders) > 0:
@@ -41,11 +32,7 @@ class Trader:
                         # Makes sure that the ask is less than or equal to our acceptable_buy_price
                         # Also makes sure that our position is within range
                         if best_ask <= acceptable_buy_price:
-                            print("BUY", str(-best_ask_volume) + "x", best_ask)
-                            orders.append(Order(symbol, best_ask, -best_ask_volume))
-
-                            # Change profit by amount bought
-                            self.profit -= best_ask
+                            orders.append(Order(product, best_ask, -best_ask_volume))
                 else:
                     # Position is positive, We sell here
                     # We look at BUY orders (Positive volume)
@@ -56,13 +43,8 @@ class Trader:
                         # Makes sure that the bid is greater than or equal to our acceptable_sell_price,
                         # Also makes sure that our position is within range
                         if best_bid >= acceptable_sell_price:
-                            print("SELL", str(best_bid_volume) + "x", best_bid);
-                            orders.append(Order(symbol, best_bid, -best_bid_volume))
+                            orders.append(Order(product, best_bid, -best_bid_volume))
 
-                            # Change profit by amount sold
-                            self.profit += best_bid
+                result[product] = orders
 
-                result[symbol] = orders
-
-        print("\n--- Net Profit:", str(self.profit), "\n\n");
         return result
