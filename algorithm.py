@@ -3,6 +3,9 @@ from datamodel import OrderDepth, Position, Product, TradingState, Order
 
 
 class Trader:
+    
+    def __init__(self):
+        self.profit = 0;
 
 
     def run(self, state: TradingState) -> Dict[str, List[Order]]:
@@ -40,6 +43,9 @@ class Trader:
                         if best_ask <= acceptable_buy_price:
                             print("BUY", str(-best_ask_volume) + "x", best_ask)
                             orders.append(Order(symbol, best_ask, -best_ask_volume))
+
+                            # Change profit by amount bought
+                            self.profit -= best_ask
                 else:
                     # Position is positive, We sell here
                     # We look at BUY orders (Positive volume)
@@ -53,8 +59,10 @@ class Trader:
                             print("SELL", str(best_bid_volume) + "x", best_bid);
                             orders.append(Order(symbol, best_bid, -best_bid_volume))
 
+                            # Change profit by amount sold
+                            self.profit += best_bid
+
                 result[symbol] = orders
 
-
-        print("\n---\n\n");
+        print("\n--- Net Profit:", str(self.profit), "\n\n");
         return result
