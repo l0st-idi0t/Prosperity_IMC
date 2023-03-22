@@ -41,6 +41,16 @@ class Trader:
 
         return orders;
 
+    def bananas_algorithm(self, state: TradingState, order_depth: OrderDepth) -> List[Order]:
+        # The product we are trading are bananas
+        product = "BANANAS"
+
+        # List of all orders we make
+        orders: list[Order] = []
+
+        
+
+
     def run(self, state: TradingState) -> Dict[str, List[Order]]:
         """
         Only method required. It takes all buy and sell orders for all symbols as an input,
@@ -50,8 +60,7 @@ class Trader:
 
         for product, order_depth in state.order_depths.items():
             if product == "PEARLS": result[product] = self.pearls_algorithm(state, order_depth);
-            elif product == "BANANAS":
-                pass
+            elif product == "BANANAS": result[product] = self.bananas_algorithm(state, order_depth);
 
 
         return result
