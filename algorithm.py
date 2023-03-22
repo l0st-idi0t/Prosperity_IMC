@@ -48,14 +48,16 @@ class Trader:
         # List of all orders we make
         orders: list[Order] = []
 
-        m = 8.721608721608722e-07;
-        b = 4891.3684355644355;
-        bias = 25
+        bid_m = 8.721608721608722e-07;
+        bid_b = 4891.3684355644355;
+        ask_m = 2.3736623736623764e-06;
+        ask_b = 4896.544435564435;
+        bias = 8;
 
         time = state.timestamp;
 
-        acceptable_buy_price = m * time + b - bias;
-        acceptable_sell_price = m * time + b + bias;
+        acceptable_buy_price = -ask_m * time + ask_b - bias;
+        acceptable_sell_price = -bid_m * time + bid_b + bias;
 
         if state.position.get(product, 0) <= 0:
             # Position is negative, We buy here
