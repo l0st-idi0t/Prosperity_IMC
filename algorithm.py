@@ -52,7 +52,7 @@ class Trader:
         bid_b = 4891.3684355644355;
         ask_m = 2.3736623736623764e-06;
         ask_b = 4896.544435564435;
-        bias = 8;
+        bias = 2;
 
         time = state.timestamp;
 
