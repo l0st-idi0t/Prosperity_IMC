@@ -51,7 +51,7 @@ class Simulation:
 
                 # If it is resting order and the position is invalid
                 # after making order, then drop the order for now
-                if is_resting_order and abs(self.position[product]) + abs(taken_volume) > self.position_limit: break
+                if is_resting_order and abs(self.position[product]) + abs(taken_volume) > self.position_limit: continue
                 
                 # Update volumes and position by taken_volume
                 volume -= taken_volume
@@ -93,7 +93,7 @@ class Simulation:
 
                 # If it is resting order and the position is invalid
                 # after making order, then drop the order for now
-                if is_resting_order and abs(self.position[product]) + abs(taken_volume) > self.position_limit: break
+                if is_resting_order and abs(self.position[product]) + abs(taken_volume) > self.position_limit: continue
 
                 # Update volumes and position by taken_volume
                 volume -= taken_volume
