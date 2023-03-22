@@ -38,22 +38,20 @@ class Simulation:
             # Sell/Ask order - Need corresponding buy
             volume = abs(order.quantity)
 
-            # Keep track of order's total volume
-            total_volume = volume
 
             while len(levels.buy_orders):
-                # Get the best bid (Person willing to pay the most)
+                # Get the best bid (Highest buy price)
                 best_bid = max(levels.buy_orders.keys())
 
                 # Break if the best bid does not match the order price
                 if best_bid < order.price: break
 
                 # The amount that is exchanged (Buy orders are positive)
-                taken_volume = min(volume, levels.buy_orders[best_bid])
+                taken_volume = min(volume, abs(levels.buy_orders[best_bid]))
 
                 # If it is resting order and the position is invalid
                 # after making order, then drop the order for now
-                if is_resting_order and abs(self.position[product]) + abs(taken_volume) > 20: break
+                if is_resting_order and abs(self.position[product]) + abs(taken_volume) > self.position_limit: break
                 
                 # Update volumes and position by taken_volume
                 volume -= taken_volume
@@ -61,7 +59,7 @@ class Simulation:
                 self.position[product] -= taken_volume
 
                 # Update cash (Selling so cash increases by volume sold)
-                self.cash += best_bid * taken_volume/total_volume
+                self.cash += best_bid * taken_volume
 
                 # Add the trade to completed trades
                 self.my_trades[product].append(Trade(product, best_bid, taken_volume, None, "self", self.prev_time))
@@ -82,22 +80,20 @@ class Simulation:
             # Buy/Bid order - Need corresponding sell
             volume = abs(order.quantity)
 
-            # Keep track of order's total volume
-            total_volume = volume
 
             while len(levels.sell_orders):
-                # Get the best ask (Person willing to pay the most)
+                # Get the best ask (Lowest sell price)
                 best_ask = min(levels.sell_orders.keys())
 
                 # Break if the best ask does not match the order price
                 if best_ask > order.price: break
 
                 # The amount that is exchanged (Sell orders are negative)
-                taken_volume = -min(volume, levels.sell_orders[best_ask])
+                taken_volume = min(volume, abs(levels.sell_orders[best_ask]))
 
                 # If it is resting order and the position is invalid
                 # after making order, then drop the order for now
-                if is_resting_order and abs(self.position[product]) + abs(taken_volume) > 20: break
+                if is_resting_order and abs(self.position[product]) + abs(taken_volume) > self.position_limit: break
 
                 # Update volumes and position by taken_volume
                 volume -= taken_volume
@@ -105,7 +101,7 @@ class Simulation:
                 self.position[product] += taken_volume
 
                 # Update cash (Buying so cash decreases by volume bought)
-                self.cash -= best_ask * taken_volume/total_volume
+                self.cash -= best_ask * taken_volume
 
                 # Add the trade to completed trades
                 self.my_trades[product].append(Trade(product, best_ask, taken_volume, "self", None, self.prev_time))
@@ -216,6 +212,9 @@ class Simulation:
 
             # Update prev_time
             self.prev_time = time
+
+        # Output trader's end cash
+        print(f"You ended with: {self.cash} seashells")
 
         # Plot trader's cash over time
         plt.plot(df_prices["timestamp"], self.historical_cash)

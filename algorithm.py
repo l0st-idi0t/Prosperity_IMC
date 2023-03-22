@@ -26,7 +26,6 @@ class Trader:
                 best_ask_volume = order_depth.sell_orders[best_ask]
 
                 # Makes sure that the ask is less than or equal to our acceptable_buy_price
-                # Also makes sure that our position is within range
                 if best_ask <= acceptable_buy_price:
                     orders.append(Order(product, best_ask, -best_ask_volume))
         else:
@@ -37,7 +36,6 @@ class Trader:
                 best_bid_volume = order_depth.buy_orders[best_bid]
 
                 # Makes sure that the bid is greater than or equal to our acceptable_sell_price,
-                # Also makes sure that our position is within range
                 if best_bid >= acceptable_sell_price:
                     orders.append(Order(product, best_bid, -best_bid_volume))
 
