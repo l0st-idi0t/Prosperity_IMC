@@ -98,7 +98,7 @@ class Simulation:
 
                 # Update volumes and position by taken_volume
                 volume -= taken_volume
-                levels.sell_orders[best_ask] -= taken_volume
+                levels.sell_orders[best_ask] += taken_volume
                 self.position[product] += taken_volume
 
                 # Update cash (Buying so cash decreases by volume bought)
@@ -111,7 +111,7 @@ class Simulation:
                 if volume <= 0: break
 
                 # Delist the sell order if it is fulfilled
-                if levels.sell_orders[best_ask] <= 0: del levels.sell_orders[best_ask]
+                if abs(levels.sell_orders[best_ask]) <= 0: del levels.sell_orders[best_ask]
 
 
             # Add a resting order if the trader's order is not fulfilled
