@@ -32,7 +32,7 @@ class Simulation:
         product = order.symbol
 
         # Get order levels, { Price: Quantity }
-        levels = self.state.order_depths[product]
+        levels = self.state.order_depths[order.symbol]
 
         if order.quantity < 0:
             # Sell/Ask order - Need corresponding buy
@@ -64,11 +64,12 @@ class Simulation:
                 # Add the trade to completed trades
                 self.my_trades[product].append(Trade(product, best_bid, taken_volume, None, "self", self.prev_time))
 
+                # Break if volume left is 0
+                if volume <= 0: break
+
                 # Delist the buy order if it is fulfilled
                 if levels.buy_orders[best_bid] <= 0: del levels.buy_orders[best_bid]
 
-                # Break if volume left is 0
-                if volume <= 0: break
 
             # Add a resting order if the trader's order is not fulfilled
             if volume > 0:
@@ -106,11 +107,12 @@ class Simulation:
                 # Add the trade to completed trades
                 self.my_trades[product].append(Trade(product, best_ask, taken_volume, "self", None, self.prev_time))
 
+                # Break if volume left is 0
+                if volume <= 0: break
+
                 # Delist the sell order if it is fulfilled
                 if levels.sell_orders[best_ask] <= 0: del levels.sell_orders[best_ask]
 
-                # Break if volume left is 0
-                if volume <= 0: break
 
             # Add a resting order if the trader's order is not fulfilled
             if volume > 0:
