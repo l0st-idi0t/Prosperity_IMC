@@ -55,7 +55,7 @@ class Trader:
         
         for sym, order_depth in state.order_depths.items():
             if sym == "PEARLS":
-                result = self.pearls_algorithm(state, order_depth);
+                result[sym] = self.pearls_algorithm(state, order_depth);
                 return result;
             if not (sym == "COCONUTS" or sym == "PINA_COLADAS"):
                 return result;
