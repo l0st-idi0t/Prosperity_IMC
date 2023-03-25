@@ -6,6 +6,9 @@ class Trader:
     
     def __init__(self):
         self.profit = 0;
+        self.lim = {"PEARLS": 20, "BANANAS": 20, "COCONUTS": 600, "PINA_COLADAS": 300, "BERRIES": 250, "DIVING_GEAR": 50}
+        self.r_buys = {}
+        self.r_sells = {}
 
     def pearls_algorithm(self, state: TradingState, order_depth: OrderDepth) -> List[Order]:
         # The product we are trading are pearls
@@ -47,9 +50,6 @@ class Trader:
         and outputs a list of orders to be sent
         """
         result = {}
-        lim = {"PEARLS": 20, "BANANAS": 20, "COCONUTS": 600, "PINA_COLADAS": 300, "BERRIES": 250, "DIVING_GEAR": 50}
-        r_buys = {}
-        r_sells = {}
         cur_buy_means = {}
         cur_sell_means = {}
         
