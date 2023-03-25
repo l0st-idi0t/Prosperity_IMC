@@ -87,9 +87,9 @@ class Trader:
             if len(state.order_depths[sym].sell_orders) > 0:
                 sell_price = max(state.order_depths[sym].buy_orders.keys())
                 sell_vol = state.order_depths[sym].buy_orders[sell_price]
-        except: continue
+        except: pass
             
-        if sym not in cur_buy_means or sym not in cur_sell_means or sym not in self.r_buys or sym not in self.r_sells or len(self.r_buys[sym]) < 50 or len(self.r_sells[sym]) < 50: continue
+        if sym not in cur_buy_means or sym not in cur_sell_means or sym not in self.r_buys or sym not in self.r_sells or len(self.r_buys[sym]) < 50 or len(self.r_sells[sym]) < 50: pass
 
         t = []
         s_point = abs(mean(self.r_buys[sym][19:]) - mean(self.r_buys[sym])) <= 0.01
