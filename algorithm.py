@@ -5,8 +5,8 @@ from statistics import mean, median
 class Trader:
     
     def __init__(self):
-        self.profit = 0;
         self.lim = {"PEARLS": 20, "BANANAS": 20, "COCONUTS": 600, "PINA_COLADAS": 300, "BERRIES": 250, "DIVING_GEAR": 50}
+        self.profit = 0;
         self.r_buys = {}
         self.r_sells = {}
 
@@ -56,6 +56,8 @@ class Trader:
         for sym, order_depth in state.order_depths.items():
             if sym == "PEARLS":
                 result = self.pearls_algorithm(state, order_depth);
+                return result;
+            if not (sym == "COCONUTS" or sym == "PINA_COLADAS"):
                 return result;
             buy_med = []
             sell_med = []
