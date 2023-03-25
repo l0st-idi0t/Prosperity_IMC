@@ -43,77 +43,80 @@ class Trader:
                     orders.append(Order(product, best_bid, -best_bid_volume))
 
         return orders;
+    
+    def pina_coconuts_algorithm(self, state: TradingState, order_depth: OrderDepth, sym) -> List[Order]:
+        cur_buy_means = {}
+        cur_sell_means = {}
+        
+        buy_med = []
+        sell_med = []
+        
+        for k,v in order_depth.buy_orders.items():
+            buy_med += [int(k)]*abs(int(v))
+        for k,v in order_depth.sell_orders.items():
+            sell_med += [int(k)]*abs(int(v))
+            
+        cur_buy_means[sym] = mean(buy_med)
+        cur_sell_means[sym] = mean(sell_med)
+        
+        if sym not in self.r_buys and sym in cur_buy_means:
+                self.r_buys[sym] = [cur_buy_means[sym]]
+        if sym not in self.r_sells and sym in cur_sell_means:
+            self.r_sells[sym] = [cur_sell_means[sym]]
 
+        elif sym in self.r_buys and sym in self.r_sells and sym in cur_buy_means and sym in cur_sell_means:
+            if len(self.r_buys[sym]) < 50:
+                self.r_buys[sym].append(cur_buy_means[sym])
+            elif len(self.r_buys[sym]) == 50:
+                self.r_buys[sym] = self.r_buys[sym][1:] + [cur_buy_means[sym]]
+
+            if len(self.r_sells[sym]) < 50:
+                self.r_sells[sym].append(cur_sell_means[sym])
+            elif len(self.r_sells[sym]) == 50:
+                self.r_sells[sym] = self.r_sells[sym][1:] + [cur_sell_means[sym]]
+                
+        buy_price = 0
+        buy_vol = 0
+        sell_price = 0
+        sell_vol = 0
+        try:
+            if len(state.order_depths[sym].buy_orders) > 0:
+                buy_price = min(state.order_depths[sym].sell_orders.keys())
+                buy_vol = state.order_depths[sym].sell_orders[buy_price]
+
+            if len(state.order_depths[sym].sell_orders) > 0:
+                sell_price = max(state.order_depths[sym].buy_orders.keys())
+                sell_vol = state.order_depths[sym].buy_orders[sell_price]
+        except: continue
+            
+        if sym not in cur_buy_means or sym not in cur_sell_means or sym not in self.r_buys or sym not in self.r_sells or len(self.r_buys[sym]) < 50 or len(self.r_sells[sym]) < 50: continue
+
+        t = []
+        s_point = abs(mean(self.r_buys[sym][19:]) - mean(self.r_buys[sym])) <= 0.01
+        b_point = abs(mean(self.r_sells[sym][19:]) - mean(self.r_sells[sym])) <= 0.01
+
+        try:
+            if sym in state.position.keys():
+                if s_point and mean(self.r_buys[sym][:20]) > mean(self.r_buys[sym]):
+                    t.append(Order(sym, sell_price, -sell_vol))
+            perc_change = ((mean(self.r_sells[sym][39:49]) - mean(self.r_sells[sym][0:10]))) / mean(self.r_sells[sym][0:10])
+            if perc_change > 0:
+                t.append(Order(sym, buy_price, -1))
+        except: pass
+        
+        return t;
+    
     def run(self, state: TradingState) -> Dict[str, List[Order]]:
         """
         Only method required. It takes all buy and sell orders for all symbols as an input,
         and outputs a list of orders to be sent
         """
         result = {}
-        cur_buy_means = {}
-        cur_sell_means = {}
         
         for sym, order_depth in state.order_depths.items():
             if sym == "PEARLS":
                 result[sym] = self.pearls_algorithm(state, order_depth);
-                return result;
-            if not (sym == "COCONUTS" or sym == "PINA_COLADAS"):
-                return result;
-            buy_med = []
-            sell_med = []
-            for k,v in order_depth.buy_orders.items():
-                buy_med += [int(k)]*abs(int(v))
-            for k,v in order_depth.sell_orders.items():
-                sell_med += [int(k)]*abs(int(v))
-            cur_buy_means[sym] = mean(buy_med)
-            cur_sell_means[sym] = mean(sell_med)
-
-        for sym in state.listings.keys():
-            if sym not in self.r_buys and sym in cur_buy_means:
-                self.r_buys[sym] = [cur_buy_means[sym]]
-            if sym not in self.r_sells and sym in cur_sell_means:
-                self.r_sells[sym] = [cur_sell_means[sym]]
-            
-            elif sym in self.r_buys and sym in self.r_sells and sym in cur_buy_means and sym in cur_sell_means:
-                if len(self.r_buys[sym]) < 50:
-                    self.r_buys[sym].append(cur_buy_means[sym])
-                elif len(self.r_buys[sym]) == 50:
-                    self.r_buys[sym] = self.r_buys[sym][1:] + [cur_buy_means[sym]]
+            elif sym == "COCONUTS" or sym == "PINA_COLADAS":
+                result[sym] = self.pina_coconuts_algorithm(state, order_depth, sym)
                 
-                if len(self.r_sells[sym]) < 50:
-                    self.r_sells[sym].append(cur_sell_means[sym])
-                elif len(self.r_sells[sym]) == 50:
-                    self.r_sells[sym] = self.r_sells[sym][1:] + [cur_sell_means[sym]]
-
-        # BUY / SELL #
-        results = {}
-        for sym in state.listings.keys():
-            buy_price = 0
-            buy_vol = 0
-            sell_price = 0
-            sell_vol = 0
-            try:
-                if len(state.order_depths[sym].buy_orders) > 0:
-                    buy_price = min(state.order_depths[sym].sell_orders.keys())
-                    buy_vol = state.order_depths[sym].sell_orders[buy_price]
-
-                if len(state.order_depths[sym].sell_orders) > 0:
-                    sell_price = max(state.order_depths[sym].buy_orders.keys())
-                    sell_vol = state.order_depths[sym].buy_orders[sell_price]
-            except: continue
-            if sym not in cur_buy_means or sym not in cur_sell_means or sym not in self.r_buys or sym not in self.r_sells or len(self.r_buys[sym]) < 50 or len(self.r_sells[sym]) < 50: continue
-
-            t = []
-            s_point = abs(mean(self.r_buys[sym][19:]) - mean(self.r_buys[sym])) <= 0.01
-            b_point = abs(mean(self.r_sells[sym][19:]) - mean(self.r_sells[sym])) <= 0.01
-
-            try:
-                if sym in state.position.keys():
-                    if s_point and mean(self.r_buys[sym][:20]) > mean(self.r_buys[sym]):
-                        t.append(Order(sym, sell_price, -sell_vol))
-                perc_change = ((mean(self.r_sells[sym][39:49]) - mean(self.r_sells[sym][0:10]))) / mean(self.r_sells[sym][0:10])
-                if perc_change > 0:
-                    t.append(Order(sym, buy_price, -1))
-                results[sym] = t
-            except: pass
         return results
